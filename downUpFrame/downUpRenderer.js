@@ -19,6 +19,8 @@ const sketch = (s)=> {
     // Function wide variables
     const width = window.innerWidth;
     const height = window.innerHeight;
+    let maxDownSpeed = 0;
+    let maxUpSpeed = 0;
 
     s.setup = () => {
         s.createCanvas(width, height);
@@ -30,8 +32,11 @@ const sketch = (s)=> {
         let dspeed = (interface[0].rx_sec / 1000000).toFixed(2);
         let uspeed = (interface[0].tx_sec / 1000000).toFixed(2);
 
-        let downAngle = s.map(dspeed, 0, 5, -Math.PI/2, 1.5*Math.PI);
-        let upAngle = s.map(uspeed, 0, 3, -Math.PI/2, 1.5*Math.PI);
+        dspeed >= maxDownSpeed ? maxDownSpeed = dspeed : maxDownSpeed;
+        uspeed >= maxUpSpeed ? maxUpSpeed = uspeed : maxUpSpeed;
+
+        let downAngle = s.map(dspeed, 0, 4, -Math.PI/2, 1.5*Math.PI);
+        let upAngle = s.map(uspeed, 0, 2, -Math.PI/2, 1.5*Math.PI);
 
         // s.background('rgba(0,0,0,0)');
         s.clear()

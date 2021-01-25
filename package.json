@@ -1,7 +1,7 @@
 {
   "name": "bandwith-checker",
   "version": "1.0.0",
-  "description": "",
+  "description": "Small electron-app to track the bandwith usage",
   "main": "main.js",
   "scripts": {
     "start": "electron-forge start",
@@ -9,7 +9,7 @@
     "make": "electron-forge make"
   },
   "keywords": [],
-  "author": "",
+  "author": "Tim Schaffert",
   "license": "ISC",
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.54",

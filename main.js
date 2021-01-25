@@ -1,5 +1,5 @@
 const { app, BrowserWindow } = require('electron')
-require('electron-reload')(__dirname);
+// require('electron-reload')(__dirname);
 
 function createWindows () {
     const downUpFrame = new BrowserWindow({
@@ -15,7 +15,14 @@ function createWindows () {
         nodeIntegration: true
       },
     })
-    downUpFrame.loadFile('downUpFrame/index.html');
+    const bandwidthAnalyzer = new BrowserWindow({
+      webPreferences: {
+        nodeIntegration: true
+      }
+    })
+    downUpFrame.loadFile('downUpFrame/downUpFrame.html');
+    bandwidthAnalyzer.loadFile('bandwidthAnalyzer/bandwidthAnalyzer.html');
+    bandwidthAnalyzer.webContents.openDevTools();
   }
   
   app.whenReady().then(createWindows)
