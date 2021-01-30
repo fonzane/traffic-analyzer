@@ -44,9 +44,14 @@ const sketch = (s)=> {
 
     s.draw = async () => {
         // Set up variables
-        const interface = await si.networkStats();
-        let dspeed = +(interface[0].rx_sec / 1000000).toFixed(2);
-        let uspeed = +(interface[0].tx_sec / 1000000).toFixed(2);
+        const interfaces = await si.networkStats();
+        let dspeed = 0/*+(interfaces[0].rx_sec / 1000000).toFixed(2);*/
+        let uspeed = 0/*+(interfaces[0].tx_sec / 1000000).toFixed(2);*/
+
+        interfaces.forEach(interface => {
+            dspeed += +(interface.rx_sec / 1000000).toFixed(2);
+            uspeed += +(interface.tx_sec / 1000000).toFixed(2);
+        })
 
         // Set max upload and download speed
         if (/*!isNaN(dspeed) && */ dspeed !== Infinity && dspeed >= maxDownSpeed) {
