@@ -1,15 +1,8 @@
 const si = require('systeminformation');
 const { ipcRenderer } = require('electron');
 
-function onReset(type) {
-    ipcRenderer.send('reset', type);
+function onChangeMax(type) {
+    let id = 'max' + type.charAt(0).toUpperCase() + type.slice(1);
+    const value = document.getElementById(id).value;
+    ipcRenderer.send('max-change', [type, value]);
 }
-
-async function getProcesses() {
-    const connections = await si.networkConnections();
-    connections.forEach((conn) => {
-        console.log(conn.pid);
-    })
-}
-
-getProcesses();

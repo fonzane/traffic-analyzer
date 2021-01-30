@@ -1,15 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="rounded">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="tailwind.css">
     <title>Traffic UI</title>
 </head>
-<body>
-    <div class="p-2 flex justify-center">
-        <button onclick="onReset('download')" class="mx-auto rounded border border-gray-300 shadow px-2 py-2 bg-green-300 text-xs text-white">Reset Max Download</button>
-        <button onclick="onReset('upload')" class="mx-auto rounded border border-gray-300 shadow px-2 py-2 bg-blue-300 text-xs text-white">Reset Max Upload</button>
+<body class="bg-gray-900 rounded">
+    <div class="p-2 flex justify-center text-gray-200 flex-col text-center">
+        <label class="text-xs mb-1">Max Downloadgeschwindigkeit</label>
+        <input id="maxDownload" oninput="onChangeMax('download')" class="text-right text-gray-900 focus:ring-indigo-500 focus:border-indigo-500 block w-full py-1 px-4 text-xs border-gray-300 rounded-md" type="number" placeholder="MB/s">
+    </div>
+    <div class="p-2 flex justify-center text-gray-200 flex-col text-center">
+        <label class="text-xs mb-1">Max. Uploadgeschwindigkeit</label>
+        <input id="maxUpload" oninput="onChangeMax('upload')" class="text-right text-gray-900 focus:ring-indigo-500 focus:border-indigo-500 block w-full py-1 px-4 text-xs border-gray-300 rounded-md" type="number" placeholder="MB/s">
     </div>
     <script src="trafficUIRenderer.js"></script>
 </body>

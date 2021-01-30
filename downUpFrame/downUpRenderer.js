@@ -2,11 +2,12 @@ const si = require('systeminformation');
 const p5 = require('p5');
 const { ipcRenderer } = require('electron');
 
-ipcRenderer.on('reset', (event, arg) => {
-    if(arg === "download") {
-        maxDownSpeed = 0;
-    } else if (arg === "upload") {
-        maxUpSpeed = 0;
+// Listen for Userinput Events from another Window
+ipcRenderer.on('max-change', (event, arg) => {
+    if(arg[0] === "download") {
+        maxDownSpeed = arg[1];
+    } else if (arg[0] === "upload") {
+        maxUpSpeed = arg[1];
     }
 });
 
@@ -45,13 +46,17 @@ const sketch = (s)=> {
     s.draw = async () => {
         // Set up variables
         const interfaces = await si.networkStats();
-        let dspeed = 0/*+(interfaces[0].rx_sec / 1000000).toFixed(2);*/
-        let uspeed = 0/*+(interfaces[0].tx_sec / 1000000).toFixed(2);*/
+        let dspeed = +(interfaces[0].rx_sec / 1000000).toFixed(2);
+        let uspeed = +(interfaces[0].tx_sec / 1000000).toFixed(2);
 
-        interfaces.forEach(interface => {
-            dspeed += +(interface.rx_sec / 1000000).toFixed(2);
-            uspeed += +(interface.tx_sec / 1000000).toFixed(2);
-        })
+        try {
+            activeInterfaces.forEach(interface => {
+                dspeed += +(interface.rx_sec / 1000000).toFixed(2);
+                uspeed += +(interface.tx_sec / 1000000).toFixed(2);
+            })
+        } catch {
+            console.log("Interfaces not initialized");
+        }
 
         // Set max upload and download speed
         if (/*!isNaN(dspeed) && */ dspeed !== Infinity && dspeed >= maxDownSpeed) {

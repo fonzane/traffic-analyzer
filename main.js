@@ -9,8 +9,8 @@ function openDownUpFrame() {
   const downUpFrame = new BrowserWindow({
     width: 210,
     height: 104,
-    // frame: false,
-    // transparent: true,
+    frame: false,
+    transparent: true,
     x: 1710,
     y: 2,
     skipTaskbar: false,
@@ -41,14 +41,20 @@ function openTrafficUI() {
 }
   
 app.whenReady().then(() => {
+  //Create Windows
   const downUpFrame = openDownUpFrame();
   const trafficUI = openTrafficUI();
+
+  //Enable Devtools
   globalShortcut.register("CmdOrCtrl+F12", () => {
     trafficUI.isFocused() && trafficUI.webContents.toggleDevTools();
     downUpFrame.isFocused() && downUpFrame.webContents.toggleDevTools();
   });
-  ipcMain.on('reset', (event, arg) => {
-    downUpFrame.webContents.send('reset', arg);
+
+  //Listener for Userinput regarding max speed values arg: [type: download/upload, value: number]
+  ipcMain.on('max-change', (event, arg) => {
+    console.log(arg);
+    downUpFrame.webContents.send('max-change', arg);
   })
 })
   
