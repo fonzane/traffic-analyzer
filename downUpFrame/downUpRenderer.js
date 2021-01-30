@@ -1,26 +1,42 @@
 const si = require('systeminformation');
 const p5 = require('p5');
+const { ipcRenderer } = require('electron');
 
-// async function networkSpeed() {
-//     try {
-//         const interface = await si.networkStats();
-//         let dspeed = (interface[0].rx_sec / 1000000).toFixed(2);
-//         let uspeed = (interface[0].tx_sec / 1000000).toFixed(2);
-//         document.getElementById('download-speed').innerHTML = dspeed;
-//         document.getElementById('upload-speed').innerHTML = uspeed;
-//         // console.log('Download Speed:', (interface[0].rx_sec / 1000000).toFixed(2));
-//         // console.log('Upload Speed:', (interface[0].tx_sec / 1000000).toFixed(2));
-//     } catch (e) {
-//         console.log(e)
-//     }
-// }
+ipcRenderer.on('reset', (event, arg) => {
+    if(arg === "download") {
+        maxDownSpeed = 0;
+    } else if (arg === "upload") {
+        maxUpSpeed = 0;
+    }
+});
+
+let maxDownloads = new Set();
+let maxUploads = new Set();
+let maxDownSpeed = 0;
+let maxUpSpeed = 0;
+
+function removeOutlier(set, variable) {
+    let lastVal = [...set][set.size-1];
+    if(set.size >= 2) {
+        if (variable > lastVal + 4* Math.pow(0.55, lastVal)) {
+            console.log('not added', variable, lastVal);
+            return lastVal;
+        } else {
+            console.log('added', variable, lastVal);
+            set.add(variable);
+            return variable;
+        }
+    } else {
+        set.add(variable);
+        return variable;
+    }
+}
 
 const sketch = (s)=> {
+    ipcRenderer.send('console-log', 'sketch called');
     // Function wide variables
     const width = window.innerWidth;
     const height = window.innerHeight;
-    let maxDownSpeed = 0;
-    let maxUpSpeed = 0;
 
     s.setup = () => {
         s.createCanvas(width, height);
@@ -29,24 +45,36 @@ const sketch = (s)=> {
     s.draw = async () => {
         // Set up variables
         const interface = await si.networkStats();
-        let dspeed = (interface[0].rx_sec / 1000000).toFixed(2);
-        let uspeed = (interface[0].tx_sec / 1000000).toFixed(2);
+        let dspeed = +(interface[0].rx_sec / 1000000).toFixed(2);
+        let uspeed = +(interface[0].tx_sec / 1000000).toFixed(2);
 
-        dspeed >= maxDownSpeed ? maxDownSpeed = dspeed : maxDownSpeed;
-        uspeed >= maxUpSpeed ? maxUpSpeed = uspeed : maxUpSpeed;
+        // Set max upload and download speed
+        if (/*!isNaN(dspeed) && */ dspeed !== Infinity && dspeed >= maxDownSpeed) {
+            maxDownSpeed = dspeed;
+            maxDownSpeed = removeOutlier(maxDownloads, maxDownSpeed);
+            ipcRenderer.send('console-log', 'New Download ' + +maxDownSpeed);
+            ipcRenderer.send('console-log', maxDownloads);
+        }
+        if (/*!isNaN(uspeed) && */ uspeed !== Infinity && uspeed >= maxUpSpeed) {
+            maxUpSpeed = uspeed;
+            maxUpSpeed = removeOutlier(maxUploads, maxUpSpeed);
+            ipcRenderer.send('console-log', 'New Upload ' + +maxUpSpeed);
+            ipcRenderer.send('console-log', maxUploads);
+        }
 
-        let downAngle = s.map(dspeed, 0, 4, -Math.PI/2, 1.5*Math.PI);
-        let upAngle = s.map(uspeed, 0, 2, -Math.PI/2, 1.5*Math.PI);
+        // Smoothing -> Durchschnittliche Werte rendern (die letzten 5/10/15)!
+        let downAngle = s.map(dspeed, 0, maxDownSpeed, -Math.PI/2, 1.5*Math.PI);
+        let upAngle = s.map(uspeed, 0, maxUpSpeed, -Math.PI/2, 1.5*Math.PI);
 
-        // s.background('rgba(0,0,0,0)');
         s.clear()
 
+        // Text
         s.fill(255);
         s.noStroke()
-        s.textSize(14)
+        s.textSize(10)
         s.textAlign(s.CENTER);
-        s.text(`${dspeed}MB\nDownload`, 3.92, 40, 100.08, 64);
-        s.text(`${uspeed}MB\nUpload`, 109.92, 40, 100.08, 64)
+        s.text(`${dspeed}MB/s\nDownload\nMax: ${maxDownSpeed}MB/s`, 3.92, 37, 100.08, 67);
+        s.text(`${uspeed}MB/s\nUpload\nMax: ${maxUpSpeed}MB/s`, 109.92, 37, 100.08, 37)
 
         // Circles
         s.noFill();
@@ -56,26 +84,10 @@ const sketch = (s)=> {
 
         s.stroke(0,255 ,0);
         s.arc(158, 52, 100, 100, -Math.PI/2, upAngle);
-
-        // s.stroke(0, 0, 255);
-        // s.arc(width/2+150, height/2, 200, 200, -90, 0, upAngle);
     }
-
-    // let angle = Math.PI*2;
-
-    // s.draw = async () => {
-
-    //     s.background(0);
-    //     s.noFill();
-    //     s.strokeWeight(4);
-    //     s.stroke(255,0 ,0);
-    //     s.arc(50, 55, 50, 50, 0, Math.PI*2);
-    // }
 }
 
 const sketchInstance = new p5(sketch);
-
-// let intervall = setInterval(networkSpeed, 100);
 
 function getSizeCalc(bytes) {
     var i = -1;
