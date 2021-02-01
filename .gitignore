@@ -1,2 +1,4 @@
 node_modules
 out
+
+trafficUI\tailwind.css -linguist-vendored
