@@ -4,13 +4,23 @@ const { ipcRenderer } = require('electron');
 
 // Listen for Userinput Events from another Window
 ipcRenderer.on('max-change', (event, arg) => {
-    if(arg[0] === "download") {
-        maxDownSpeed = arg[1];
-    } else if (arg[0] === "upload") {
-        maxUpSpeed = arg[1];
+    userInput = true;
+    if (arg[1] === '' || arg[1] === '0') {
+        userInput = false;
+        maxDownSpeed = 0;
+        maxDownloads.clear();
+        maxUpSpeed = 0;
+        maxUploads.clear();
+    } else {
+        if(arg[0] === "download") {
+            maxDownSpeed = arg[1];
+        } else if (arg[0] === "upload") {
+            maxUpSpeed = arg[1];
+        }
     }
 });
 
+let userInput = false;
 let maxDownloads = new Set();
 let maxUploads = new Set();
 let maxDownSpeed = 0;
@@ -58,18 +68,20 @@ const sketch = (s)=> {
             console.log("Interfaces not initialized");
         }
 
-        // Set max upload and download speed
-        if (/*!isNaN(dspeed) && */ dspeed !== Infinity && dspeed >= maxDownSpeed) {
-            maxDownSpeed = dspeed;
-            maxDownSpeed = removeOutlier(maxDownloads, maxDownSpeed);
-            ipcRenderer.send('console-log', 'New Download ' + +maxDownSpeed);
-            ipcRenderer.send('console-log', maxDownloads);
-        }
-        if (/*!isNaN(uspeed) && */ uspeed !== Infinity && uspeed >= maxUpSpeed) {
-            maxUpSpeed = uspeed;
-            maxUpSpeed = removeOutlier(maxUploads, maxUpSpeed);
-            ipcRenderer.send('console-log', 'New Upload ' + +maxUpSpeed);
-            ipcRenderer.send('console-log', maxUploads);
+        if (!userInput) {
+            // Set max upload and download speed
+            if (/*!isNaN(dspeed) && */ dspeed !== Infinity && dspeed >= maxDownSpeed) {
+                maxDownSpeed = dspeed;
+                maxDownSpeed = removeOutlier(maxDownloads, maxDownSpeed);
+                ipcRenderer.send('console-log', 'New Download ' + +maxDownSpeed);
+                ipcRenderer.send('console-log', maxDownloads);
+            }
+            if (/*!isNaN(uspeed) && */ uspeed !== Infinity && uspeed >= maxUpSpeed) {
+                maxUpSpeed = uspeed;
+                maxUpSpeed = removeOutlier(maxUploads, maxUpSpeed);
+                ipcRenderer.send('console-log', 'New Upload ' + +maxUpSpeed);
+                ipcRenderer.send('console-log', maxUploads);
+            }
         }
 
         // Smoothing -> Durchschnittliche Werte rendern (die letzten 5/10/15)!
