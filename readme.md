@@ -1,4 +1,4 @@
-#Network Traffic Analyzer
+# Network Traffic Analyzer
 
 ### General Information
 This app is supposed to give detailed and beautiful visual feedback and information regarding a computers network traffic. Since it is build with **Electron**, it is supposed to be cross-platform comaptible.
