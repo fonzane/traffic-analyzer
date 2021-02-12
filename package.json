@@ -26,7 +26,9 @@
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
+    "fast-speedtest-api": "^0.3.2",
     "p5": "^1.2.0",
+    "sudo-prompt": "^9.2.1",
     "systeminformation": "^5.0.4"
   },
   "config": {

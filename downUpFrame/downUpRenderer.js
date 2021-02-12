@@ -43,6 +43,8 @@ function removeOutlier(set, variable) {
     }
 }
 
+
+
 const sketch = (s)=> {
     ipcRenderer.send('console-log', 'sketch called');
     // Function wide variables
@@ -59,14 +61,14 @@ const sketch = (s)=> {
         let dspeed = +(interfaces[0].rx_sec / 1000000).toFixed(2);
         let uspeed = +(interfaces[0].tx_sec / 1000000).toFixed(2);
 
-        try {
-            activeInterfaces.forEach(interface => {
-                dspeed += +(interface.rx_sec / 1000000).toFixed(2);
-                uspeed += +(interface.tx_sec / 1000000).toFixed(2);
-            })
-        } catch {
-            console.log("Interfaces not initialized");
-        }
+        // try {
+        //     activeInterfaces.forEach(interface => {
+        //         dspeed += +(interface.rx_sec / 1000000).toFixed(2);
+        //         uspeed += +(interface.tx_sec / 1000000).toFixed(2);
+        //     })
+        // } catch {
+        //     console.log("Interfaces not initialized");
+        // }
 
         if (!userInput) {
             // Set max upload and download speed
