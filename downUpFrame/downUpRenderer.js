@@ -20,6 +20,14 @@ ipcRenderer.on('max-change', (event, arg) => {
     }
 });
 
+ipcRenderer.on('speed-test', (event, arg) => {
+    speedTest = true;
+    console.log('speed-test done');
+    console.log(event);
+    console.log(arg);
+})
+
+let speedTest = false;
 let userInput = false;
 let maxDownloads = new Set();
 let maxUploads = new Set();
@@ -70,7 +78,7 @@ const sketch = (s)=> {
         //     console.log("Interfaces not initialized");
         // }
 
-        if (!userInput) {
+        if (!userInput || !speedTest) {
             // Set max upload and download speed
             if (/*!isNaN(dspeed) && */ dspeed !== Infinity && dspeed >= maxDownSpeed) {
                 maxDownSpeed = dspeed;

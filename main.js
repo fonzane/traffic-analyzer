@@ -1,10 +1,16 @@
 const { app, BrowserWindow, ipcMain, globalShortcut } = require('electron')
 require('electron-reload')(__dirname);
+const speedTest = require('./speedtest');
 
+let dspeed = 0;
+
+// ==== Global IPC Handlers ==== //
 ipcMain.on('console-log', (event, arg) => {
   console.log(arg);
-})
+});
 
+
+// ==== Functions to create the windows ==== //
 function openDownUpFrame() {
   const downUpFrame = new BrowserWindow({
     width: 210,
@@ -20,6 +26,7 @@ function openDownUpFrame() {
     },
   });
   downUpFrame.loadFile('downUpFrame/downUpFrame.html');
+  console.log('download speed: ', dspeed);
   return downUpFrame;
 }
 
@@ -55,6 +62,11 @@ app.whenReady().then(() => {
   ipcMain.on('max-change', (event, arg) => {
     console.log(arg);
     downUpFrame.webContents.send('max-change', arg);
+  })
+
+  ipcMain.on('speed-test', async(event, arg) => {
+    dspeed = await speedTest.testDownloadSpeed();
+    downUpFrame.webContents.send('speed-test', dspeed);
   })
 })
   
