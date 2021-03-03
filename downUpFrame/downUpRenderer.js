@@ -22,7 +22,7 @@ ipcRenderer.on('max-change', (event, arg) => {
 
 ipcRenderer.on('speed-test', (event, arg) => {
     speedTest = true;
-    console.log('speed-test done');
+    maxDownSpeed = arg;
     console.log(event);
     console.log(arg);
 })
